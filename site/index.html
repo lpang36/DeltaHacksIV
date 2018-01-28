@@ -130,6 +130,7 @@
 
        // Bias the SearchBox results towards current map's viewport.
        map.addListener('bounds_changed', function() {
+
          searchBox.setBounds(map.getBounds());
        });
 
@@ -137,6 +138,7 @@
        // Listen for the event fired when the user selects a prediction and retrieve
        // more details for that place.
        searchBox.addListener('places_changed', function() {
+
          var places = searchBox.getPlaces();
 
          if (places.length == 0) {
@@ -156,13 +158,8 @@
              console.log("Returned place contains no geometry");
              return;
            }
-           /*var icon = {
-             url: place.icon,
-             size: new google.maps.Size(71, 71),
-             origin: new google.maps.Point(0, 0),
-             anchor: new google.maps.Point(17, 34),
-             scaledSize: new google.maps.Size(25, 25)
-           };*/
+
+
 
            // Create a marker for each place.
            markers.push(new google.maps.Marker({
@@ -176,15 +173,32 @@
            if (place.geometry.viewport) {
              // Only geocodes have viewport.
              bounds.union(place.geometry.viewport);
+              pos2 = place.geometry.location;
            } else {
              bounds.extend(place.geometry.location);
+              pos2 = place.geometry.location;
            }
          });
-         pos2 = place.geometry.location;
-         map.fitBounds(bounds);
+
+
+        
+        // map.fitBounds(bounds);
+
 
          //pass in 2d array of coordinates from python backend, call it coords
-         calculateAndDisplayRoute(directionsService, directionsDisplay, coords);
+
+         var xmlhttp = new XMLHttpRequest();
+         var myArr;
+         xmlhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            myArr = JSON.parse(this.responseText);
+            document.getElementById("demo").innerHTML = myArr[0];
+            window.alert(myArr[1]);
+          }
+        };
+        xmlhttp.open("GET", "json_file.txt", true);
+        xmlhttp.send();
+        calculateAndDisplayRoute(directionsService, directionsDisplay, myArr);
        });
 
 
@@ -206,14 +220,14 @@
         for (var i = 0; i < coords.length; i++) {
             var curPos = {
              lat: coords[i][0],
-             lng: coords[i],[1]
+             lng: coords[i][1]
            };
             waypts.push({
               location: curPos,
               stopover: true
             });
           }
-        }
+
 
         directionsService.route({
           origin: document.getElementById('start').value,
