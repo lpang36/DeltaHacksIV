@@ -14,7 +14,6 @@ def __main__():
 @app.route('/api/<min_x>/<min_y>/<max_x>/<max_y>', methods = ['GET'])
 def api(min_x,min_y,max_x,max_y):
   data = path_plan((float(min_x),float(min_y)),(float(max_x),float(max_y)))
-  print(data)
   return jsonify({'path':data})
 
 if __name__ == "__main__":
