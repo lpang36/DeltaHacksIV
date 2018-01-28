@@ -86,7 +86,7 @@
           </div>
           <div class="row">
             <div class="slidecontainer">
-              <input type="range" min="0" max="1000" value="100" id="myRange">
+              <input type="range" min="0" max="1000" value="500" id="myRange">
             </div>
           </div>
           <div class="row">
@@ -280,7 +280,8 @@
 
      function calculateAndDisplayRoute(pos1,pos2,lat1,lng1,lat2,lng2) {
        var xhr = new XMLHttpRequest();
-       xhr.open('GET','api/'+lng1+'/'+lat1+'/'+lng2+'/'+lat2+'/'+document.getElementById('myRange').value*0.00001);
+       var weight = document.getElementById('myRange').value
+       xhr.open('GET','api/'+lng1+'/'+lat1+'/'+lng2+'/'+lat2+'/'+weight*0.001);
        xhr.onload = function(data) {
          coords = JSON.parse(data.currentTarget.response).path
          console.log(coords)
@@ -298,8 +299,10 @@
                 otherpts.push({location: curPos, stopover: true})
              });
           }
-          setTimeout(function() {                
-            console.log(waypts)
+          setTimeout(function() {  
+            if (weight<100)
+              otherpts = []
+            console.log(otherpts)
             var directionsService = new google.maps.DirectionsService();
             var directionsDisplay = new google.maps.DirectionsRenderer;
             directionsDisplay.setMap(map)

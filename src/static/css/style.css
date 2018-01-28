@@ -98,6 +98,7 @@ input:checked + .slider:before {
 
 .notMap {
   padding: 20px;
+  overflow: scroll;
 }
 
 .row {
