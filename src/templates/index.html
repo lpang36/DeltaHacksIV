@@ -78,12 +78,6 @@
       <div class='notMap' style="width:20%;height:1000px;float:left;">
         <div class='ctrl' style="width:100%;height:50%;">
           <div class="row">
-            <label class="switch">
-              <input type="checkbox">
-              <span class="slider round"></span>
-            </label>
-          </div>
-          <div class="row">
             <select id="mode" name="mode">
               <option value="DRIVING" name="mode">DRIVING</option>
               <option value="WALKING" name="mode">WALKING</option>
@@ -92,7 +86,7 @@
           </div>
           <div class="row">
             <div class="slidecontainer">
-              <input type="range" min="0" max="1000" value="500" id="myRange">
+              <input type="range" min="0" max="1000" value="100" id="myRange">
             </div>
           </div>
           <div class="row">
@@ -100,9 +94,6 @@
           </div>
           <div class="row">
             To: <input type="text" id="to">
-          </div>
-          <div class="row">
-            <button type="button">Get Directions</button>
           </div>
         </div>
         <div id='dir' style="width:100%;height:50%;"></div>
@@ -289,7 +280,7 @@
 
      function calculateAndDisplayRoute(pos1,pos2,lat1,lng1,lat2,lng2) {
        var xhr = new XMLHttpRequest();
-       xhr.open('GET','api/'+lng1+'/'+lat1+'/'+lng2+'/'+lat2);
+       xhr.open('GET','api/'+lng1+'/'+lat1+'/'+lng2+'/'+lat2+'/'+document.getElementById('myRange').value*0.00001);
        xhr.onload = function(data) {
          coords = JSON.parse(data.currentTarget.response).path
          console.log(coords)

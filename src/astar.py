@@ -21,7 +21,7 @@ def dist(finish,current):
     return Val
   
 def crime(current,arr,weight=0.001):
-    return arr[int(current[1])][int(current[0])]*weight
+    return arr[int(current[1])][int(current[0])].item()
 
 def path(cmFrom,current,x,y):
     total = [current]
@@ -54,7 +54,7 @@ def astar(start_coord,finish_coord,x,y,dims,weight=0.001):
             if i == finish:
                 cmFrom[i] = current[1]
                 return path(cmFrom,i,x,y)
-            tempGScore = gScore[current[1]] + crime(i,arr,weight)
+            tempGScore = gScore[current[1]] + crime(i,arr,weight)*weight
             tempFScore = tempGScore + dist(finish,i)
             if i in fScore and fScore[i]<=tempFScore:
                 continue
