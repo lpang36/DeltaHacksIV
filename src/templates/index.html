@@ -11,15 +11,16 @@
     <title>Inert Title</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 
     <!-- Custom fonts for this template -->
-    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static',filename='vendor/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Cabin:700' rel='stylesheet' type='text/css'>
-
+    
     <!-- Custom styles for this template -->
-    <link href="css/grayscale.min.css" rel="stylesheet">
+    <link href="{{ url_for('static',filename='css/grayscale.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href='{{ url_for('static',filename='css/style.css') }}'>
 
   </head>
 
@@ -70,9 +71,39 @@
     <!-- About Section -->
     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
     <section id="map">
-
-        <div id="googleMap" style="width:100%;height:1000px;"></div>
-
+      <div class='notMap' style="width:20%;height:1000px;float:left;">
+        <div class='ctrl' style="width:100%;height:50%;">
+          <div class="row">
+            <label class="switch">
+              <input type="checkbox">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="row">
+            <select name="mode">
+              <option value="driving">Driving</option>
+              <option value="walking">Walking</option>
+              <option value="biking">Biking</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="slidecontainer">
+              <input type="range" min="0" max="1000" value="500" id="myRange">
+            </div>
+          </div>
+          <div id="to" class="row">
+            From: <input type="text" name="to">
+          </div>
+          <div id="from" class="row">
+            To: <input type="text" name="from">
+          </div>
+          <div class="row">
+            <button type="button" onclick="submit()">Get Directions</button>
+          </div>
+        </div>
+        <div class='dir' style="width:100%;height:50%;"></div>
+      </div>
+      <div id="googleMap" style="width:80%;height:1000px;float:right"></div>
     </section>
 
 
@@ -88,10 +119,9 @@
       var map;
       var pos, pos2;
       function initMap() {
-        var zoomVal = 5;
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: zoomVal
+        map = new google.maps.Map(document.getElementById('googleMap'), {
+                    zoom: 12,
+          center: {lat: 37.7749, lng: -122.4194}
             });
 
 
@@ -180,11 +210,11 @@
              bounds.extend(place.geometry.location);
            }
          });
-         pos2 = place.geometry.location;
+         pos2 = places[0].geometry.location;
          map.fitBounds(bounds);
 
          //pass in 2d array of coordinates from python backend, call it coords
-         calculateAndDisplayRoute(directionsService, directionsDisplay, coords);
+         calculateAndDisplayRoute(pos.lat,pos.lng,pos2.lat(),pos2.lng());
        });
 
 
@@ -200,45 +230,45 @@
 
 
 
-     function calculateAndDisplayRoute(directionsService, directionsDisplay, coords) {
-        var waypts = [];
-
-        for (var i = 0; i < coords.length; i++) {
-            var curPos = {
-             lat: coords[i][0],
-             lng: coords[i],[1]
-           };
-            waypts.push({
-              location: curPos,
-              stopover: true
-            });
+     function calculateAndDisplayRoute(lat1,lng1,lat2,lng2) {
+        $.get('api/'+lng1+'/'+lat1+'/'+lng2+'/'+lat2, function(coords) {
+          var waypts = [];
+          for (var i = 0; i < coords.length; i++) {
+              var curPos = {
+               lat: coords[i][0],
+               lng: coords[i][1]
+             };
+              waypts.push({
+                location: curPos,
+                stopover: true
+              });
           }
-        }
 
-        directionsService.route({
-          origin: document.getElementById('start').value,
-          destination: document.getElementById('end').value,
-          waypoints: waypts,
-          optimizeWaypoints: true,
-          travelMode: 'DRIVING'
-        }, function(response, status) {
-          if (status === 'OK') {
-            directionsDisplay.setDirections(response);
-            var route = response.routes[0];
-            var summaryPanel = document.getElementById('directions-panel');
-            summaryPanel.innerHTML = '';
-            // For each route, display summary information.
-            for (var i = 0; i < route.legs.length; i++) {
-              var routeSegment = i + 1;
-              summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
-                  '</b><br>';
-              summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
-              summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
-              summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+          directionsService.route({
+            origin: document.getElementById('start').value,
+            destination: document.getElementById('end').value,
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: 'DRIVING'
+          }, function(response, status) {
+            if (status === 'OK') {
+              directionsDisplay.setDirections(response);
+              var route = response.routes[0];
+              var summaryPanel = document.getElementById('directions-panel');
+              summaryPanel.innerHTML = '';
+              // For each route, display summary information.
+              for (var i = 0; i < route.legs.length; i++) {
+                var routeSegment = i + 1;
+                summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+                    '</b><br>';
+                summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+              }
+            } else {
+              window.alert('Directions request failed due to ' + status);
             }
-          } else {
-            window.alert('Directions request failed due to ' + status);
-          }
+          });
         });
       }
    </script>
@@ -249,7 +279,6 @@
       <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxDWSD0TwTWvk1sDcCNkcS70JgkS__YQY&callback=initMap"type="text/javascript"></script>
 
 
     <!-- Custom scripts for this template -->

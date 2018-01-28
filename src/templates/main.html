@@ -1,0 +1,43 @@
+<head>
+  <title></title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <link rel="stylesheet" href='{{ url_for('static',filename='css/style.css') }}'>
+  <script src="{{ url_for('static',filename='js/submit.js') }}"></script>
+</head>
+<body>
+  <div class='map'></div>
+  <script>
+    function initMap() {
+      var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: {lat: 37.7749, lng: -122.4194}
+        });
+    }
+  </script>
+  <script async defer>
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6yQCFQnx_S7r_y_G-2XE6hd89JLcwqbY&callback=initMap">
+  </script>
+  <div class='ctrl'>
+    <label class="switch">
+      <input type="checkbox">
+      <span class="slider round"></span>
+    </label>
+    <select name="mode">
+      <option value="driving">Driving</option>
+      <option value="walking">Walking</option>
+      <option value="biking">Biking</option>
+    </select>
+    <div class="slidecontainer">
+      <input type="range" min="0" max="1" value="0.5" id="myRange">
+    </div>
+    <div class="endpts">
+      From: <input type="text" name="to">
+      To: <input type="text" name="from">
+    </div>
+    <button type="button" onclick="submit()">Get Directions</button>
+  </div>
+  <div class='dir'></div>
+</body>
