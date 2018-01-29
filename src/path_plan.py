@@ -7,7 +7,7 @@ def colinear(p1,p2,p3):
     return p2[0]==p3[0]
   return (p2[1]-p1[1])/(p2[0]-p1[0])==(p3[1]-p1[1])/(p3[0]-p1[0])
 
-def path_plan(start,finish,weight=0.001,limit=23):
+def path_plan(start,finish,weight=0.001,limit=8):
   x1 = start[0]
   y1 = start[1]
   x2 = finish[0]

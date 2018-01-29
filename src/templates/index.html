@@ -334,7 +334,7 @@
      function calculateAndDisplayRoute(pos1,pos2,lat1,lng1,lat2,lng2) {
        var xhr = new XMLHttpRequest();
        var weight = document.getElementById('myRange').value
-       xhr.open('GET','api/'+lng1+'/'+lat1+'/'+lng2+'/'+lat2+'/'+weight*0.001);
+       xhr.open('GET','api/'+lng1+'/'+lat1+'/'+lng2+'/'+lat2+'/'+weight*0.000001);
        xhr.onload = function(data) {
          coords = JSON.parse(data.currentTarget.response).path
          console.log(coords)
@@ -347,10 +347,7 @@
                lng: coords[i][0]
              };
             console.log(curPos)
-             geocoder.geocode({'location': curPos}, function(results,status) {
-                waypts.push(results[0].formatted_address);
-                otherpts.push({location: curPos, stopover: true})
-             });
+             otherpts.push({location: $.extend({},curPos), stopover: true})
           }
           setTimeout(function() {  
             if (weight<100)
@@ -365,7 +362,8 @@
               destination: pos2,
               waypoints: otherpts,
               optimizeWaypoints: true,
-              travelMode: 'DRIVING'
+              travelMode: 'DRIVING',
+              provideRouteAlternatives: true
             }, function(response, status) {
               if (status === 'OK') {
                 console.log(response)
